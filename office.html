@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Document Portal</title>
+    <style>
+        :root {
+            /* Modern Gradient Palette */
+            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            --accent-color: #4f46e5;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* =========================================
+           WATERMARK LOGO SECTION (UPDATED)
+        ========================================= */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            
+            /* REPLACE 'logo.png' WITH YOUR ACTUAL LOGO FILENAME */
+            background-image: url('logo.png'); 
+            
+            background-repeat: no-repeat;
+            background-position: center;
+            
+            /* UPDATED: Increased size to 50% */
+            background-size: 50%; 
+            
+            /* UPDATED: Increased opacity to 0.15 (More visible) */
+            opacity: 0.15; 
+        }
+
+        /* Modern Header with Gradient */
+        header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3.5rem 2rem 5rem; 
+            text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%); 
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Floating Search Bar */
+        .search-container {
+            max-width: 700px;
+            margin: -40px auto 40px; 
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        input#searchInput {
+            width: 100%;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input#searchInput:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2), 0 8px 10px -6px rgba(37, 99, 235, 0.1);
+        }
+
+        /* File Grid */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Attractive File Card */
+        .file-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column; 
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            /* Added slight background transparency to cards so logo shows behind them faintly */
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Left Accent Border on Hover */
+        .file-card::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--accent-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Card Layout */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .icon {
+            width: 50px;
+            height: 50px;
+            background: #eff6ff;
+            color: var(--accent-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .file-details { flex: 1; }
+
+        .file-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .file-meta {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .download-btn {
+            background-color: white;
+            color: var(--accent-color);
+            border: 2px solid #eef2ff;
+            padding: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            transition: all 0.2s;
+            margin-top: 5px;
+        }
+
+        .download-btn:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Badges */
+        .badge {
+            background: #fee2e2;
+            color: #ef4444;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* No Results Message */
+        #noResults {
+            text-align: center;
+            grid-column: 1 / -1;
+            display: none;
+            color: var(--text-sub);
+            padding: 40px;
+            font-style: italic;
+            background: rgba(255,255,255,0.8);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IMPORTANT FILES FOR GDS</h1>
+        <p>Dont ask anyone for files</p>
+        <p>you can download here easyly</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" onkeyup="filterFiles()" placeholder="🔍  Search documents...">
+    </div>
+
+    <div class="container" id="fileList">
+        
+        <div class="file-card">
+            <div class="card-header">
+                <div class="icon">📄</div>
+                <div class="file-details">
+                    <span class="file-name">LEAVE APPLICATION <span class="badge">GDS</span></span>
+                    <div class="file-meta">Pdf • 84KB</div>
+                </div>
+            </div>
+            <a href="Leave Application.pdf" class="download-btn" download>Download PDF</a>
+        </div>
+
+        <div class="file-card">
+            <div class="card-header">
+                <div class="icon">📊</div>
+                <div class="file-details">
+                    <span class="file-name">Charge Report for Dooars Sub Division</span>
+                    <div class="file-meta">Pdf • 500 KB</div>
+                </div>
+            </div>
+            <a href="Charge Report for Dooars Sub Division.pdf" class="download-btn" download>Download Excel</a>
+        </div>
+
+        <div class="file-card">
+            <div class="card-header">
+                <div class="icon">🖼️</div>
+                <div class="file-details">
+                    <span class="file-name">Application_Form_For_Pre_Mature_Closure_Of_Account</span>
+                    <div class="file-meta">Pdf • 12 MB</div>
+                </div>
+            </div>
+            <a href="Application_Form_For_Pre_Mature_Closure_Of_Account (1).pdf" class="download-btn" download>Download Pack</a>
+        </div>
+
+        <div class="file-card">
+            <div class="card-header">
+                <div class="icon">📝</div>
+                <div class="file-details">
+                    <span class="file-name">SB Account Revival</span>
+                    <div class="file-meta">Pdf • 150 KB</div>
+                </div>
+            </div>
+            <a href="SB Account Revival.pdf" class="download-btn" download>Download Word</a>
+        </div>
+
+         <div class="file-card">
+            <div class="card-header">
+                <div class="icon">📝</div>
+                <div class="file-details">
+                    <span class="file-name">TD Bill Formate</span>
+                    <div class="file-meta">Pdf • 150 KB</div>
+                </div>
+            </div>
+            <a href="TD Bill Formate.pdf" class="download-btn" download>Download Word</a>
+        </div>
+
+        <div class="file-card">
+            <div class="card-header">
+                <div class="icon">📝</div>
+                <div class="file-details">
+                    <span class="file-name">RPLI Proposal Form</span>
+                    <div class="file-meta">Pdf • 150 KB</div>
+                </div>
+            </div>
+            <a href="RPLI Proposal Form.pdf" class="download-btn" download>Download Word</a>
+        </div>
+
+        <div class="file-card">
+            <div class="card-header">
+                <div class="icon">📝</div>
+                <div class="file-details">
+                    <span class="file-name">RPLI REVIVAL</span>
+                    <div class="file-meta">Pdf • 150 KB</div>
+                </div>
+            </div>
+            <a href="RPLI REVIVAL.pdf" class="download-btn" download>Download Word</a>
+        </div>
+
+
+
+
+
+        <div id="noResults">No files found matching your search.</div>
+
+    </div>
+
+    <script>
+        function filterFiles() {
+            var input, filter, container, cards, name, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            container = document.getElementById("fileList");
+            cards = container.getElementsByClassName("file-card");
+            var hasVisible = false;
+
+            for (i = 0; i < cards.length; i++) {
+                name = cards[i].getElementsByClassName("file-name")[0];
+                if (name) {
+                    txtValue = name.textContent || name.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        cards[i].style.display = "flex"; 
+                        hasVisible = true;
+                    } else {
+                        cards[i].style.display = "none";
+                    }
+                }
+            }
+            document.getElementById("noResults").style.display = hasVisible ? "none" : "block";
+        }
+    </script>
+
+</body>
+</html>
